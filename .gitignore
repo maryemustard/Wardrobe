@@ -1,0 +1,33 @@
+# --- Environment ---
+.env
+.env.*
+!.env.example
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
+.coverage
+.coverage.*
+
+# --- Node / frontend ---
+node_modules/
+frontend/dist/
+dist/
+*.local
+.vite/
+
+# --- Editors / OS ---
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# --- Build / deploy ---
+*.log
