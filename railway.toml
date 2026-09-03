@@ -3,9 +3,8 @@ builder = "dockerfile"
 dockerfilePath = "Dockerfile"
 
 [deploy]
-# Runs migrations, then starts the server. DATABASE_URL must be set
-# (reference it from the Railway PostgreSQL plugin).
-startCommand = "sh -c 'alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}'"
+# The image's CMD runs `alembic upgrade head` before starting uvicorn.
+# DATABASE_URL must be set (reference it from the Railway PostgreSQL plugin).
 healthcheckPath = "/api/health"
 healthcheckTimeout = 100
 restartPolicyType = "on_failure"

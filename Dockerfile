@@ -20,4 +20,6 @@ COPY --from=frontend /web/dist ./frontend_dist
 ENV SPA_DIST_DIR=/app/frontend_dist
 
 EXPOSE 8000
-CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
+# Run pending migrations, then start the server. Fails the deploy if a
+# migration fails, which is what we want.
+CMD ["sh", "-c", "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
