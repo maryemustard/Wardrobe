@@ -11,6 +11,16 @@ select = ["E", "F", "I", "UP", "B"]
 # `alembic/` is a local dir; keep the installed package classified correctly.
 known-third-party = ["alembic"]
 
+[tool.ruff.lint.flake8-bugbear]
+# FastAPI dependency-injection markers are meant to be call expressions in defaults.
+extend-immutable-calls = [
+    "fastapi.Depends",
+    "fastapi.Query",
+    "fastapi.Path",
+    "fastapi.Header",
+    "fastapi.Body",
+]
+
 [tool.pytest.ini_options]
 addopts = "-q"
 testpaths = ["tests"]

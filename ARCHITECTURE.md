@@ -127,8 +127,8 @@ wardrobe/
 
 | Phase | Deliverable |
 |-------|-------------|
-| **0 – Scaffold** | Repo, both skeletons, docker-compose, CI, deploy the empty shell to Railway *(done)* |
-| **1 – Access + Items** | Basic Auth dependency; Item model + migration; filtered/paginated CRUD endpoints; wardrobe grid, item form (no photo yet), detail view |
+| **0 – Scaffold** | Repo, both skeletons, docker-compose, CI, empty shell on Railway — **done** |
+| **1 – Access + Items** | Basic Auth dependency; Item model + migration; filtered CRUD endpoints; wardrobe grid, item form, detail view, archive/delete — **done** |
 | **2 – Images** | `/uploads/sign`, upload component wired into item form, cleanup on delete |
 | **3 – Outfits** | Outfit + join models, endpoints, outfit pages with item picker |
 | **4 – Polish** | WearLog, stats dashboard, tags, search, responsive styling, empty states |

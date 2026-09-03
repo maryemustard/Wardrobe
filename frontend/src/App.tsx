@@ -1,37 +1,54 @@
-import { useEffect, useState } from "react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter, Link, Route, Routes } from "react-router-dom";
 
-type Health = { status: string; environment: string };
+import LoginGate from "./auth/LoginGate";
+import { clearCreds } from "./lib/auth";
+import ItemDetail from "./pages/ItemDetail";
+import ItemForm from "./pages/ItemForm";
+import Wardrobe from "./pages/Wardrobe";
+
+const queryClient = new QueryClient({
+  defaultOptions: { queries: { retry: false } },
+});
+
+function Header() {
+  return (
+    <header className="topbar">
+      <Link to="/" className="brand">
+        Wardrobe
+      </Link>
+      <nav>
+        <Link to="/items/new">+ Add item</Link>
+        <button
+          className="linklike"
+          onClick={() => {
+            clearCreds();
+            location.reload();
+          }}
+        >
+          Sign out
+        </button>
+      </nav>
+    </header>
+  );
+}
 
 export default function App() {
-  const [health, setHealth] = useState<Health | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    fetch("/api/health")
-      .then((r) => {
-        if (!r.ok) throw new Error(`HTTP ${r.status}`);
-        return r.json() as Promise<Health>;
-      })
-      .then(setHealth)
-      .catch((e: unknown) => setError(String(e)));
-  }, []);
-
   return (
-    <main>
-      <h1>Wardrobe Manager</h1>
-      <p>Phase 0 — scaffold. Nothing to see here yet.</p>
-      <p>
-        API health:{" "}
-        {health ? (
-          <strong>
-            {health.status} ({health.environment})
-          </strong>
-        ) : error ? (
-          <span>unreachable — {error}</span>
-        ) : (
-          <span>checking…</span>
-        )}
-      </p>
-    </main>
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <LoginGate>
+          <Header />
+          <main className="container">
+            <Routes>
+              <Route path="/" element={<Wardrobe />} />
+              <Route path="/items/new" element={<ItemForm />} />
+              <Route path="/items/:id" element={<ItemDetail />} />
+              <Route path="/items/:id/edit" element={<ItemForm />} />
+            </Routes>
+          </main>
+        </LoginGate>
+      </BrowserRouter>
+    </QueryClientProvider>
   );
 }

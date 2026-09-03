@@ -1,20 +1,208 @@
 :root {
+  --bg: #fafafa;
+  --surface: #ffffff;
+  --border: #e2e2e2;
+  --text: #1a1a1a;
+  --muted: #6b6b6b;
+  --accent: #2f5bea;
+  --danger: #c0392b;
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   line-height: 1.5;
-  color: #1a1a1a;
-  background: #fafafa;
+  color: var(--text);
+  background: var(--bg);
+}
+
+* {
+  box-sizing: border-box;
 }
 
 body {
   margin: 0;
 }
 
-main {
-  max-width: 40rem;
-  margin: 4rem auto;
+a {
+  color: var(--accent);
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+button {
+  font: inherit;
+  padding: 0.5rem 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  cursor: pointer;
+}
+button:hover {
+  border-color: var(--muted);
+}
+button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+button.danger {
+  color: var(--danger);
+  border-color: var(--danger);
+}
+button.linklike {
+  border: none;
+  background: none;
+  color: var(--accent);
+  padding: 0;
+}
+
+input,
+select,
+textarea {
+  font: inherit;
+  padding: 0.45rem 0.55rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  width: 100%;
+}
+textarea {
+  min-height: 4.5rem;
+  resize: vertical;
+}
+
+/* Layout */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.9rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+.topbar .brand {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--text);
+}
+.topbar nav {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+.container {
+  max-width: 60rem;
+  margin: 1.5rem auto;
   padding: 0 1.5rem;
 }
 
-h1 {
-  margin-bottom: 0.25rem;
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+.toolbar h1 {
+  margin: 0;
+  font-size: 1.4rem;
+}
+.toolbar select {
+  width: auto;
+}
+
+/* Grid + cards */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+  gap: 1rem;
+}
+.card {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--surface);
+  color: var(--text);
+}
+.card:hover {
+  border-color: var(--muted);
+  text-decoration: none;
+}
+.card img,
+.card .card-noimg {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+}
+.card .card-noimg {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f0f0f0;
+  color: var(--muted);
+  text-transform: capitalize;
+}
+.card-body {
+  padding: 0.6rem 0.7rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+.card-body span {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+/* Forms */
+.item-form,
+.login form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  max-width: 26rem;
+}
+.item-form label,
+.login label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+.login {
+  max-width: 26rem;
+  margin: 5rem auto;
+  padding: 0 1.5rem;
+}
+
+/* Detail */
+.detail img {
+  max-width: 20rem;
+  border-radius: 8px;
+}
+.detail dl {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.35rem 1rem;
+  margin: 1rem 0;
+}
+.detail dl div {
+  display: contents;
+}
+.detail dt {
+  color: var(--muted);
+}
+.detail dd {
+  margin: 0;
+}
+.detail .actions {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.error {
+  color: var(--danger);
+}
+.empty {
+  color: var(--muted);
 }

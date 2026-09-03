@@ -14,8 +14,9 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for the full design.
 
 ## Status
 
-**Phase 0 — scaffold.** Runnable skeleton: `/api/health` endpoint, a React page that
-pings it, Docker/Compose/CI wiring. No feature code yet.
+**Phase 1 — access + items.** Live on Railway. HTTP Basic Auth gate, `Item` CRUD
+API, and a React wardrobe grid with add / edit / detail / archive / delete.
+Next: Cloudinary image uploads (Phase 2).
 
 ## Local development
 

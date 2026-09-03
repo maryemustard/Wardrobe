@@ -6,6 +6,7 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
 from app.config import get_settings
+from app.routers import items
 
 settings = get_settings()
 
@@ -23,6 +24,9 @@ app.add_middleware(
 @app.get("/api/health")
 def health() -> dict[str, str]:
     return {"status": "ok", "environment": settings.environment}
+
+
+app.include_router(items.router)
 
 
 # In the production image the built SPA is copied in and served from here.
