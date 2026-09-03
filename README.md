@@ -1,13 +1,13 @@
 # Wardrobe Manager
 
-A multi-user web app for cataloguing clothing, building outfits, and tracking wear.
+A single-user web app for cataloguing clothing, building outfits, and tracking wear.
 
 ## Stack
 
 - **Backend:** FastAPI (Python 3.13) + SQLAlchemy + Alembic + PostgreSQL
 - **Frontend:** React + Vite + TypeScript
-- **Auth:** JWT access + refresh tokens (Phase 1)
-- **Images:** Cloudinary (Phase 3)
+- **Access:** HTTP Basic Auth, one credential pair (no accounts) — Phase 1
+- **Images:** Cloudinary — Phase 2
 - **Deploy:** Railway (single service, multi-stage Dockerfile)
 
 See [ARCHITECTURE.md](ARCHITECTURE.md) for the full design.
@@ -82,9 +82,8 @@ railway.toml      Railway build/start/healthcheck config
 1. New Railway project → **Deploy from GitHub repo** → pick `maryemustard/Wardrobe`.
 2. Add the **PostgreSQL** plugin to the project.
 3. In the app service **Variables**, set:
-   - `DATABASE_URL` → reference the Postgres plugin's connection string
-   - `JWT_SECRET` → a long random string
-   - `CORS_ORIGINS` → the app's public URL
+   - `DATABASE_URL` → `${{Postgres.DATABASE_URL}}`
+   - `BASIC_AUTH_USER` / `BASIC_AUTH_PASS` → your login for the app (Phase 1+)
    - `ENVIRONMENT` → `prod`
 4. Railway builds the Dockerfile, runs `alembic upgrade head`, and serves on `$PORT`.
    Health check: `/api/health`.

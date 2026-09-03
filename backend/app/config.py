@@ -12,9 +12,9 @@ class Settings(BaseSettings):
 
     database_url: str = "postgresql+psycopg://wardrobe:wardrobe@localhost:5432/wardrobe"
 
-    jwt_secret: str = "dev-secret-change-me"
-    access_token_expire_minutes: int = 30
-    refresh_token_expire_days: int = 14
+    # Single-credential HTTP Basic Auth gate for the whole app.
+    basic_auth_user: str = "me"
+    basic_auth_pass: str = "change-me"
 
     # Comma-separated list of allowed browser origins.
     cors_origins: str = "http://localhost:5173"

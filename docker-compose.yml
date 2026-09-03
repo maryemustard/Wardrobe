@@ -24,7 +24,8 @@ services:
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
     environment:
       DATABASE_URL: postgresql+psycopg://wardrobe:wardrobe@db:5432/wardrobe
-      JWT_SECRET: dev-secret
+      BASIC_AUTH_USER: me
+      BASIC_AUTH_PASS: dev
       CORS_ORIGINS: http://localhost:5173
       ENVIRONMENT: dev
     volumes:
