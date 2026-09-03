@@ -1,5 +1,6 @@
 from functools import lru_cache
 
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -25,6 +26,16 @@ class Settings(BaseSettings):
 
     # Absolute path to the built frontend (set in the Docker image). Empty in dev.
     spa_dist_dir: str = ""
+
+    @field_validator("database_url")
+    @classmethod
+    def _use_psycopg_driver(cls, v: str) -> str:
+        """Accept the plain URL that Railway/Heroku provide and pin psycopg3."""
+        if v.startswith("postgres://"):
+            v = "postgresql://" + v.removeprefix("postgres://")
+        if v.startswith("postgresql://"):
+            v = "postgresql+psycopg://" + v.removeprefix("postgresql://")
+        return v
 
     @property
     def cors_origins_list(self) -> list[str]:
