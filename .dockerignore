@@ -1,0 +1,16 @@
+.git
+.github
+**/node_modules
+**/__pycache__
+**/.venv
+**/.pytest_cache
+**/.ruff_cache
+**/.mypy_cache
+frontend/dist
+backend/frontend_dist
+.env
+.env.*
+!.env.example
+*.md
+docker-compose.yml
+push.sh

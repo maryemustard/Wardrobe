@@ -1,0 +1,16 @@
+# Tool configuration only. Runtime deps live in requirements.txt.
+
+[tool.ruff]
+line-length = 100
+target-version = "py313"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.ruff.lint.isort]
+# `alembic/` is a local dir; keep the installed package classified correctly.
+known-third-party = ["alembic"]
+
+[tool.pytest.ini_options]
+addopts = "-q"
+testpaths = ["tests"]
