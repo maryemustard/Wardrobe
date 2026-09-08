@@ -20,9 +20,9 @@ class Settings(BaseSettings):
     # Comma-separated list of allowed browser origins.
     cors_origins: str = "http://localhost:5173"
 
-    cloudinary_cloud_name: str = ""
-    cloudinary_api_key: str = ""
-    cloudinary_api_secret: str = ""
+    # Directory for uploaded item photos. On Railway this points at a mounted
+    # volume (e.g. /data/media); locally it defaults to backend/media/.
+    media_dir: str = "media"
 
     # Absolute path to the built frontend (set in the Docker image). Empty in dev.
     spa_dist_dir: str = ""

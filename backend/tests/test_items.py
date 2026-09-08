@@ -61,3 +61,46 @@ def test_archived_hidden_by_default(client: TestClient) -> None:
 def test_bad_category_rejected(client: TestClient) -> None:
     resp = client.post("/api/items", json={"name": "Thing", "category": "hat"}, auth=AUTH)
     assert resp.status_code == 422
+
+
+def _make_item(client: TestClient) -> str:
+    created = client.post("/api/items", json={"name": "Tee", "category": "top"}, auth=AUTH)
+    return created.json()["id"]
+
+
+def test_image_upload_and_remove(client: TestClient) -> None:
+    item_id = _make_item(client)
+
+    up = client.post(
+        f"/api/items/{item_id}/image",
+        files={"file": ("photo.png", b"\x89PNG\r\n\x1a\n fake bytes", "image/png")},
+        auth=AUTH,
+    )
+    assert up.status_code == 200, up.text
+    assert up.json()["image_url"] == f"/media/{item_id}.png"
+    assert up.json()["image_public_id"] == f"{item_id}.png"
+
+    rm = client.delete(f"/api/items/{item_id}/image", auth=AUTH)
+    assert rm.status_code == 200
+    assert rm.json()["image_url"] is None
+    assert rm.json()["image_public_id"] is None
+
+
+def test_image_rejects_non_image(client: TestClient) -> None:
+    item_id = _make_item(client)
+    resp = client.post(
+        f"/api/items/{item_id}/image",
+        files={"file": ("notes.txt", b"hello", "text/plain")},
+        auth=AUTH,
+    )
+    assert resp.status_code == 415
+
+
+def test_delete_item_removes_its_image(client: TestClient) -> None:
+    item_id = _make_item(client)
+    client.post(
+        f"/api/items/{item_id}/image",
+        files={"file": ("p.png", b"x", "image/png")},
+        auth=AUTH,
+    )
+    assert client.delete(f"/api/items/{item_id}", auth=AUTH).status_code == 204

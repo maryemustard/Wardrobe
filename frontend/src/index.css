@@ -203,6 +203,31 @@ textarea {
 .error {
   color: var(--danger);
 }
-.empty {
+.empty,
+.muted {
   color: var(--muted);
+}
+
+/* Photo field in the item form */
+.photo-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+.photo-field .muted {
+  margin: 0;
+  font-size: 0.85rem;
+}
+.photo-preview {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.4rem;
+}
+.photo-preview img {
+  max-width: 10rem;
+  border-radius: 6px;
+  border: 1px solid var(--border);
 }

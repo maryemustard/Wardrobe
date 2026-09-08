@@ -31,3 +31,6 @@ dist/
 
 # --- Build / deploy ---
 *.log
+
+# --- Uploaded media (local dev; prod uses a Railway volume) ---
+backend/media/

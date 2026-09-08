@@ -17,6 +17,8 @@ export default function ItemForm() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [form, setForm] = useState<ItemInput>(EMPTY);
+  const [file, setFile] = useState<File | null>(null);
+  const [removePhoto, setRemovePhoto] = useState(false);
 
   const existing = useQuery({
     queryKey: ["items", id],
@@ -42,8 +44,14 @@ export default function ItemForm() {
   }, [existing.data]);
 
   const save = useMutation({
-    mutationFn: (payload: ItemInput) =>
-      editing ? api.updateItem(id as string, payload) : api.createItem(payload),
+    mutationFn: async (payload: ItemInput) => {
+      const item = editing
+        ? await api.updateItem(id as string, payload)
+        : await api.createItem(payload);
+      if (file) return api.uploadImage(item.id, file);
+      if (removePhoto && item.image_url) return api.removeImage(item.id);
+      return item;
+    },
     onSuccess: (item) => {
       void queryClient.invalidateQueries({ queryKey: ["items"] });
       navigate(`/items/${item.id}`);
@@ -71,6 +79,8 @@ export default function ItemForm() {
   }
 
   if (editing && existing.isLoading) return <p>Loading…</p>;
+
+  const currentImage = !removePhoto && !file ? (existing.data?.image_url ?? null) : null;
 
   return (
     <form className="item-form" onSubmit={submit}>
@@ -157,6 +167,28 @@ export default function ItemForm() {
         Notes
         <textarea value={form.notes ?? ""} onChange={(e) => set("notes", e.target.value)} />
       </label>
+
+      <div className="photo-field">
+        <span>Photo</span>
+        {currentImage && (
+          <div className="photo-preview">
+            <img src={currentImage} alt={form.name} />
+            <button type="button" onClick={() => setRemovePhoto(true)}>
+              Remove photo
+            </button>
+          </div>
+        )}
+        {removePhoto && !file && <p className="muted">Photo will be removed on save.</p>}
+        <input
+          type="file"
+          accept="image/*"
+          onChange={(e) => {
+            setFile(e.target.files?.[0] ?? null);
+            setRemovePhoto(false);
+          }}
+        />
+        {file && <p className="muted">New photo: {file.name}</p>}
+      </div>
 
       {save.isError && <p className="error">Could not save. Try again.</p>}
       <button disabled={save.isPending}>{save.isPending ? "Saving…" : "Save"}</button>

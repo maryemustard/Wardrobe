@@ -8,6 +8,7 @@
 **/.mypy_cache
 frontend/dist
 backend/frontend_dist
+backend/media
 .env
 .env.*
 !.env.example

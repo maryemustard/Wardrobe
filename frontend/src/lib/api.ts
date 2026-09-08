@@ -16,7 +16,8 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   const headers = new Headers(init.headers);
   const auth = getAuthHeader();
   if (auth) headers.set("Authorization", auth);
-  if (init.body) headers.set("Content-Type", "application/json");
+  // Let the browser set the multipart boundary for FormData bodies.
+  if (typeof init.body === "string") headers.set("Content-Type", "application/json");
 
   const res = await fetch(`${BASE}${path}`, { ...init, headers });
 
@@ -51,5 +52,12 @@ export const api = {
   updateItem: (id: string, data: ItemPatch) =>
     request<Item>(`/api/items/${id}`, { method: "PATCH", body: JSON.stringify(data) }),
   deleteItem: (id: string) => request<void>(`/api/items/${id}`, { method: "DELETE" }),
+  uploadImage: (id: string, file: File) => {
+    const body = new FormData();
+    body.append("file", file);
+    return request<Item>(`/api/items/${id}/image`, { method: "POST", body });
+  },
+  removeImage: (id: string) =>
+    request<Item>(`/api/items/${id}/image`, { method: "DELETE" }),
   ping: () => request<Item[]>("/api/items?limit=1"),
 };

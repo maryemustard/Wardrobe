@@ -28,6 +28,11 @@ def health() -> dict[str, str]:
 
 app.include_router(items.router)
 
+# Uploaded item photos, served from the media directory (a Railway volume in prod).
+_media = Path(settings.media_dir)
+_media.mkdir(parents=True, exist_ok=True)
+app.mount("/media", StaticFiles(directory=str(_media)), name="media")
+
 
 # In the production image the built SPA is copied in and served from here.
 # In local dev SPA_DIST_DIR is unset and Vite serves the frontend separately.

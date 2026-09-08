@@ -11,7 +11,7 @@ wear. One person (the owner) uses it. Deployed on Railway.
 | Database  | PostgreSQL                                          | Railway managed plugin; `DATABASE_URL` injected |
 | Frontend  | React + Vite + TypeScript                           | React Router, TanStack Query for server state |
 | Access    | HTTP Basic Auth, single credential                  | `BASIC_AUTH_USER` / `BASIC_AUTH_PASS` env vars, checked by FastAPI middleware. No user accounts, no signup, no JWT. |
-| Images    | Cloudinary (free tier)                              | Browser uploads directly via signed params; DB stores `secure_url` + `public_id` |
+| Images    | Railway Volume                                      | Multipart upload to the API, saved on a mounted disk (`MEDIA_DIR`), served at `/media/*`; DB stores the relative URL + filename |
 | Deploy    | Railway, single service via multi-stage Dockerfile  | Node build stage -> Python runtime; FastAPI serves `/api/*` and the built SPA at `/` |
 | CI        | GitHub Actions                                      | Lint + test on PR |
 
@@ -42,10 +42,9 @@ No `User` table. Everything belongs to the single owner implicitly.
 Every endpoint requires HTTP Basic Auth.
 
 ```
-Items     GET  /items           filters: category, color, season, brand, q, archived; paginated
+Items     GET  /items           filters: category, season, brand, q, archived; paginated
           POST /items           GET /items/{id}   PATCH /items/{id}   DELETE /items/{id}
-
-Uploads   POST /uploads/sign    -> Cloudinary signature params for direct browser upload
+          POST /items/{id}/image   (multipart)    DELETE /items/{id}/image
 
 Outfits   GET  /outfits         POST /outfits (body has item_ids)
           GET  /outfits/{id}    PATCH /outfits/{id}   DELETE /outfits/{id}
@@ -55,14 +54,16 @@ Stats     GET  /stats           phase 2: counts by category, most/least worn, co
 Health    GET  /api/health      unauthenticated, for Railway's health check
 ```
 
-## 4. Image upload flow (Cloudinary, signed)
+## 4. Image upload flow (Railway Volume)
 
-1. User picks a photo in the item form.
-2. Frontend calls `POST /api/uploads/sign` -> backend returns
-   `{ timestamp, signature, api_key, cloud_name, folder }` signed with the API secret.
-3. Frontend uploads the file directly to Cloudinary, receives `secure_url` + `public_id`.
-4. Frontend saves the item with those two fields.
-5. On item delete, backend calls Cloudinary `destroy(public_id)`.
+1. User picks a photo in the item form (`<input type="file">`).
+2. On save, the frontend creates/updates the item, then `POST`s the file as
+   multipart to `/api/items/{id}/image`.
+3. The backend validates type (JPEG/PNG/WebP/GIF) and size (<= 8 MB), writes it to
+   `MEDIA_DIR/{id}.{ext}` on the mounted volume, and stores
+   `image_url = /media/{id}.{ext}` + `image_public_id = {id}.{ext}` on the item.
+4. FastAPI serves the file from `MEDIA_DIR` at `/media/*` (static mount).
+5. Removing a photo, or deleting the item, unlinks the file.
 
 ## 5. Repo structure
 
@@ -75,11 +76,11 @@ wardrobe/
   backend/
     pyproject.toml
     app/
-      main.py          app, CORS, Basic Auth dependency, static SPA mount
+      main.py          app, CORS, static SPA mount, /media mount
       config.py        pydantic-settings from env
-      database.py      deps.py
-      models/  schemas/  routers/  services/    cloudinary.py
-    alembic/  tests/
+      database.py      deps.py      security.py (Basic Auth)      media.py
+      models/  schemas/  routers/
+    alembic/  tests/  media/  (local uploads; gitignored)
   frontend/
     package.json  vite.config.ts  index.html
     src/  api/  pages/  components/  lib/
@@ -95,7 +96,7 @@ wardrobe/
 | `DATABASE_URL` | Postgres connection (Railway provides) |
 | `BASIC_AUTH_USER` | Username for the app's Basic Auth gate |
 | `BASIC_AUTH_PASS` | Password for the app's Basic Auth gate |
-| `CLOUDINARY_CLOUD_NAME` / `CLOUDINARY_API_KEY` / `CLOUDINARY_API_SECRET` | Image hosting |
+| `MEDIA_DIR` | Where uploaded photos are stored; on Railway a path in the mounted volume (e.g. `/data/media`) |
 | `CORS_ORIGINS` | Comma-separated allowed origins |
 | `ENVIRONMENT` | `dev` / `prod` |
 
@@ -104,24 +105,24 @@ wardrobe/
 | Var | Purpose |
 |-----|---------|
 | `VITE_API_BASE_URL` | API origin (empty string when same-origin single service) |
-| `VITE_CLOUDINARY_CLOUD_NAME` | Used to build image URLs |
 
 ## 7. Deployment (Railway)
 
-- One project: **PostgreSQL plugin** + **app service** (this repo).
+- One project: **PostgreSQL plugin** + **app service** (this repo) + a **Volume**
+  mounted on the app service (e.g. at `/data`, with `MEDIA_DIR=/data/media`).
 - Build: multi-stage Dockerfile.
   1. `node` stage: `npm ci && npm run build` in `frontend/` -> `frontend/dist`.
   2. `python` stage: install backend deps, copy `frontend/dist` into the image.
-- Release command: `alembic upgrade head`.
-- Start: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`.
-- FastAPI mounts `frontend/dist` as static files with an SPA fallback to `index.html`
-  for non-`/api` routes.
+- The image `CMD` runs `alembic upgrade head`, then `uvicorn` on `$PORT`.
+- FastAPI serves the SPA (SPA fallback for non-`/api` routes) and uploaded photos
+  at `/media/*`.
 
 ## 8. Local development
 
 - `docker compose up` starts Postgres, the API (reload), and the Vite dev server.
-- The Vite dev server proxies `/api` to the backend.
-- Copy `.env.example` to `.env` and fill in Cloudinary keys + Basic Auth values.
+- The Vite dev server proxies `/api` and `/media` to the backend.
+- Copy `.env.example` to `.env` and set the Basic Auth values. Uploads go to
+  `backend/media/` locally.
 
 ## 9. Build phases
 
@@ -129,6 +130,6 @@ wardrobe/
 |-------|-------------|
 | **0 – Scaffold** | Repo, both skeletons, docker-compose, CI, empty shell on Railway — **done** |
 | **1 – Access + Items** | Basic Auth dependency; Item model + migration; filtered CRUD endpoints; wardrobe grid, item form, detail view, archive/delete — **done** |
-| **2 – Images** | `/uploads/sign`, upload component wired into item form, cleanup on delete |
+| **2 – Images** | Railway Volume storage; `POST/DELETE /items/{id}/image`; file input in the item form; photos shown on cards + detail — **done** |
 | **3 – Outfits** | Outfit + join models, endpoints, outfit pages with item picker |
 | **4 – Polish** | WearLog, stats dashboard, tags, search, responsive styling, empty states |

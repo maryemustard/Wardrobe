@@ -1,8 +1,9 @@
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile, status
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.deps import get_db
+from app.media import ALLOWED_TYPES, MAX_BYTES, delete_image_file, media_dir
 from app.models.item import Item
 from app.schemas.item import ItemCreate, ItemRead, ItemUpdate
 from app.security import require_auth
@@ -72,5 +73,48 @@ def delete_item(item_id: str, db: Session = Depends(get_db)) -> None:
     item = db.get(Item, item_id)
     if item is None:
         raise HTTPException(status_code=404, detail="Item not found")
+    delete_image_file(item)
     db.delete(item)
     db.commit()
+
+
+@router.post("/{item_id}/image", response_model=ItemRead)
+async def upload_image(
+    item_id: str,
+    file: UploadFile = File(),
+    db: Session = Depends(get_db),
+) -> Item:
+    item = db.get(Item, item_id)
+    if item is None:
+        raise HTTPException(status_code=404, detail="Item not found")
+
+    ext = ALLOWED_TYPES.get(file.content_type or "")
+    if ext is None:
+        raise HTTPException(
+            status_code=415, detail="Only JPEG, PNG, WebP or GIF images are allowed"
+        )
+    data = await file.read()
+    if len(data) > MAX_BYTES:
+        raise HTTPException(status_code=413, detail="Image is larger than 8 MB")
+
+    delete_image_file(item)  # drop any previous file for this item
+    filename = f"{item_id}{ext}"
+    (media_dir() / filename).write_bytes(data)
+    item.image_url = f"/media/{filename}"
+    item.image_public_id = filename
+    db.commit()
+    db.refresh(item)
+    return item
+
+
+@router.delete("/{item_id}/image", response_model=ItemRead)
+def remove_image(item_id: str, db: Session = Depends(get_db)) -> Item:
+    item = db.get(Item, item_id)
+    if item is None:
+        raise HTTPException(status_code=404, detail="Item not found")
+    delete_image_file(item)
+    item.image_url = None
+    item.image_public_id = None
+    db.commit()
+    db.refresh(item)
+    return item
