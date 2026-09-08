@@ -9,16 +9,18 @@ from the repo's other app (`backend/` + `frontend/`) and does not touch it.
 
 ## What it does
 
-One page at `/`:
+Main page at `/`:
 
 - A form to add a clothing item — **name**, **category**, **description**, **photo**.
 - A grid of everything you've saved, newest first, with the photo on each card
   (or a category placeholder if there's no photo).
+- Each card has an **Edit** link → `/<id>/edit/`, a prefilled form to change the
+  item (or swap/clear its photo) and save.
 - Saved items persist across refreshes (SQLite; photos in `media/`).
 - Missing name → inline error. Non-image or >8 MB photo → inline error. No crash.
 - Empty wardrobe shows a "add your first one" message.
 
-No HTMX, no JavaScript build step — a plain form POST with a redirect.
+No HTMX, no JavaScript build step — plain form POSTs with redirects.
 
 ## Run it locally
 
@@ -65,7 +67,8 @@ uv run python manage.py test          # or: python manage.py test
 
 Covers: the page loads with the empty state; a valid item saves, redirects,
 and shows in the grid; a blank name is rejected with a message and no row
-saved; a non-image upload is rejected. (4 tests.)
+saved; a non-image upload is rejected; the edit page is prefilled; editing
+updates the item; editing a missing id is a 404. (7 tests.)
 
 ## Config (deploy only)
 
@@ -83,8 +86,8 @@ django_app/
   wardrobe/                 the one app
     models.py               Item(name, category, description, photo, created_at)
     forms.py                ItemForm + photo size check
-    views.py                the one view (list + create)
-    templates/wardrobe/wardrobe.html
+    views.py                wardrobe (list + create) and edit_item
+    templates/wardrobe/     wardrobe.html, edit.html, _form_fields.html
     tests.py
   media/                    uploaded photos (gitignored)
   db.sqlite3               local database (gitignored)

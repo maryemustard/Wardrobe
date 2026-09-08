@@ -43,3 +43,24 @@ class WardrobeTests(TestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(Item.objects.count(), 0)
         self.assertContains(resp, "valid image")
+
+    def test_edit_page_is_prefilled(self):
+        item = Item.objects.create(name="Old name", category="top")
+        resp = self.client.get(reverse("edit_item", args=[item.pk]))
+        self.assertEqual(resp.status_code, 200)
+        self.assertContains(resp, 'value="Old name"')
+
+    def test_edit_updates_the_item(self):
+        item = Item.objects.create(name="Old name", category="top", description="")
+        resp = self.client.post(
+            reverse("edit_item", args=[item.pk]),
+            {"name": "New name", "category": "outerwear", "description": "warmer"},
+        )
+        self.assertRedirects(resp, reverse("wardrobe"))
+        item.refresh_from_db()
+        self.assertEqual(item.name, "New name")
+        self.assertEqual(item.category, "outerwear")
+
+    def test_editing_a_missing_item_is_404(self):
+        resp = self.client.get(reverse("edit_item", args=[9999]))
+        self.assertEqual(resp.status_code, 404)
