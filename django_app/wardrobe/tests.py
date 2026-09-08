@@ -1,3 +1,4 @@
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.urls import reverse
 
@@ -27,3 +28,18 @@ class WardrobeTests(TestCase):
         self.assertEqual(resp.status_code, 200)  # form re-renders, no redirect
         self.assertEqual(Item.objects.count(), 0)
         self.assertContains(resp, "This field is required")
+
+    def test_non_image_photo_is_rejected(self):
+        bad_file = SimpleUploadedFile("notes.txt", b"not an image", content_type="text/plain")
+        resp = self.client.post(
+            reverse("wardrobe"),
+            {
+                "name": "Striped tee",
+                "category": "top",
+                "description": "",
+                "photo": bad_file,
+            },
+        )
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(Item.objects.count(), 0)
+        self.assertContains(resp, "valid image")

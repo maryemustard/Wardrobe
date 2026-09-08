@@ -63,7 +63,9 @@ Then open **<http://127.0.0.1:8000/>**. Stop the server with **Ctrl-C**.
 uv run python manage.py test          # or: python manage.py test
 ```
 
-Covers: a valid item saves and appears; a blank name is rejected with no crash.
+Covers: the page loads with the empty state; a valid item saves, redirects,
+and shows in the grid; a blank name is rejected with a message and no row
+saved; a non-image upload is rejected. (4 tests.)
 
 ## Config (deploy only)
 
