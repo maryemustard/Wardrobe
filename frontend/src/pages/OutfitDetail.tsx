@@ -61,7 +61,9 @@ export default function OutfitDetail() {
         </button>
       </div>
 
-      <h2>{outfit.items.length} items</h2>
+      <h2>
+        {outfit.items.length} item{outfit.items.length === 1 ? "" : "s"}
+      </h2>
       <div className="grid">
         {outfit.items.map((item) => (
           <ItemCard key={item.id} item={item} />
