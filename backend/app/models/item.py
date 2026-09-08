@@ -1,25 +1,17 @@
-import uuid
-from datetime import UTC, date, datetime
+from datetime import date, datetime
 from decimal import Decimal
 
 from sqlalchemy import Boolean, Date, DateTime, Numeric, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.database import Base
-
-
-def _new_id() -> str:
-    return str(uuid.uuid4())
-
-
-def _utcnow() -> datetime:
-    return datetime.now(UTC).replace(tzinfo=None)
+from app.models.common import new_id, utcnow
 
 
 class Item(Base):
     __tablename__ = "items"
 
-    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_new_id)
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_id)
     name: Mapped[str] = mapped_column(String(200))
     category: Mapped[str] = mapped_column(String(40), index=True)
     color: Mapped[str | None] = mapped_column(String(60))
@@ -33,5 +25,5 @@ class Item(Base):
     image_url: Mapped[str | None] = mapped_column(Text)
     image_public_id: Mapped[str | None] = mapped_column(String(200))
     is_archived: Mapped[bool] = mapped_column(Boolean, default=False, index=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=_utcnow)
-    updated_at: Mapped[datetime] = mapped_column(DateTime, default=_utcnow, onupdate=_utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow, onupdate=utcnow)

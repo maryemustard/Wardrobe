@@ -131,5 +131,5 @@ wardrobe/
 | **0 – Scaffold** | Repo, both skeletons, docker-compose, CI, empty shell on Railway — **done** |
 | **1 – Access + Items** | Basic Auth dependency; Item model + migration; filtered CRUD endpoints; wardrobe grid, item form, detail view, archive/delete — **done** |
 | **2 – Images** | Railway Volume storage; `POST/DELETE /items/{id}/image`; file input in the item form; photos shown on cards + detail — **done** |
-| **3 – Outfits** | Outfit + join models, endpoints, outfit pages with item picker |
+| **3 – Outfits** | Outfit + `outfit_items` join, `/api/outfits` CRUD with an item-id set, Outfits list / builder (item checklist) / detail pages, nav — **done** |
 | **4 – Polish** | WearLog, stats dashboard, tags, search, responsive styling, empty states |

@@ -18,14 +18,17 @@ export default function Wardrobe() {
     <>
       <div className="toolbar">
         <h1>My wardrobe</h1>
-        <select value={category} onChange={(e) => setCategory(e.target.value)}>
-          <option value="">All categories</option>
-          {CATEGORIES.map((c) => (
-            <option key={c} value={c}>
-              {c}
-            </option>
-          ))}
-        </select>
+        <div className="toolbar-actions">
+          <select value={category} onChange={(e) => setCategory(e.target.value)}>
+            <option value="">All categories</option>
+            {CATEGORIES.map((c) => (
+              <option key={c} value={c}>
+                {c}
+              </option>
+            ))}
+          </select>
+          <Link to="/items/new">+ Add item</Link>
+        </div>
       </div>
 
       {isLoading && <p>Loading…</p>}

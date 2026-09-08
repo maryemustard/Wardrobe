@@ -42,3 +42,20 @@ export interface ItemInput {
   price?: number | null;
   notes?: string | null;
 }
+
+export interface Outfit {
+  id: string;
+  name: string;
+  occasion: string | null;
+  notes: string | null;
+  items: Item[];
+  created_at: string;
+  updated_at: string;
+}
+
+export interface OutfitInput {
+  name: string;
+  occasion?: string | null;
+  notes?: string | null;
+  item_ids: string[];
+}

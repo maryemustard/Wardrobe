@@ -1,10 +1,13 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Link, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Link, NavLink, Route, Routes } from "react-router-dom";
 
 import LoginGate from "./auth/LoginGate";
 import { clearCreds } from "./lib/auth";
 import ItemDetail from "./pages/ItemDetail";
 import ItemForm from "./pages/ItemForm";
+import OutfitDetail from "./pages/OutfitDetail";
+import OutfitForm from "./pages/OutfitForm";
+import Outfits from "./pages/Outfits";
 import Wardrobe from "./pages/Wardrobe";
 
 const queryClient = new QueryClient({
@@ -18,7 +21,10 @@ function Header() {
         Wardrobe
       </Link>
       <nav>
-        <Link to="/items/new">+ Add item</Link>
+        <NavLink to="/" end>
+          Items
+        </NavLink>
+        <NavLink to="/outfits">Outfits</NavLink>
         <button
           className="linklike"
           onClick={() => {
@@ -45,6 +51,10 @@ export default function App() {
               <Route path="/items/new" element={<ItemForm />} />
               <Route path="/items/:id" element={<ItemDetail />} />
               <Route path="/items/:id/edit" element={<ItemForm />} />
+              <Route path="/outfits" element={<Outfits />} />
+              <Route path="/outfits/new" element={<OutfitForm />} />
+              <Route path="/outfits/:id" element={<OutfitDetail />} />
+              <Route path="/outfits/:id/edit" element={<OutfitForm />} />
             </Routes>
           </main>
         </LoginGate>

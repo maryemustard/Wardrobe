@@ -6,7 +6,7 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
 from app.config import get_settings
-from app.routers import items
+from app.routers import items, outfits
 
 settings = get_settings()
 
@@ -27,6 +27,7 @@ def health() -> dict[str, str]:
 
 
 app.include_router(items.router)
+app.include_router(outfits.router)
 
 # Uploaded item photos, served from the media directory (a Railway volume in prod).
 _media = Path(settings.media_dir)

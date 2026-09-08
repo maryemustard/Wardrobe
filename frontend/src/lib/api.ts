@@ -1,4 +1,4 @@
-import type { Item, ItemInput } from "./types";
+import type { Item, ItemInput, Outfit, OutfitInput } from "./types";
 import { clearCreds, getAuthHeader } from "./auth";
 
 const BASE: string = import.meta.env.VITE_API_BASE_URL ?? "";
@@ -59,5 +59,15 @@ export const api = {
   },
   removeImage: (id: string) =>
     request<Item>(`/api/items/${id}/image`, { method: "DELETE" }),
+
+  listOutfits: () => request<Outfit[]>("/api/outfits"),
+  getOutfit: (id: string) => request<Outfit>(`/api/outfits/${id}`),
+  createOutfit: (data: OutfitInput) =>
+    request<Outfit>("/api/outfits", { method: "POST", body: JSON.stringify(data) }),
+  updateOutfit: (id: string, data: Partial<OutfitInput>) =>
+    request<Outfit>(`/api/outfits/${id}`, { method: "PATCH", body: JSON.stringify(data) }),
+  deleteOutfit: (id: string) =>
+    request<void>(`/api/outfits/${id}`, { method: "DELETE" }),
+
   ping: () => request<Item[]>("/api/items?limit=1"),
 };

@@ -14,9 +14,10 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for the full design.
 
 ## Status
 
-**Phase 1 — access + items.** Live on Railway. HTTP Basic Auth gate, `Item` CRUD
-API, and a React wardrobe grid with add / edit / detail / archive / delete.
-Next: Cloudinary image uploads (Phase 2).
+**Phase 3 — outfits.** Live on Railway. HTTP Basic Auth gate; `Item` CRUD with
+photo uploads (Railway volume); `Outfit` CRUD grouping items; React UI with a
+wardrobe grid and an outfit builder.
+Next: polish (search / filters / mobile) or wear tracking.
 
 ## Local development
 
