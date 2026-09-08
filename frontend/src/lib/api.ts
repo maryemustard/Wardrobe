@@ -68,6 +68,11 @@ export const api = {
     request<Outfit>(`/api/outfits/${id}`, { method: "PATCH", body: JSON.stringify(data) }),
   deleteOutfit: (id: string) =>
     request<void>(`/api/outfits/${id}`, { method: "DELETE" }),
+  suggestOutfit: (prompt: string) =>
+    request<{ items: Item[]; rationale: string }>("/api/outfits/suggest", {
+      method: "POST",
+      body: JSON.stringify({ prompt }),
+    }),
 
   ping: () => request<Item[]>("/api/items?limit=1"),
 };

@@ -24,6 +24,9 @@ class Settings(BaseSettings):
     # volume (e.g. /data/media); locally it defaults to backend/media/.
     media_dir: str = "media"
 
+    # Optional. Enables the AI outfit suggester. Key from console.anthropic.com.
+    anthropic_api_key: str = ""
+
     # Absolute path to the built frontend (set in the Docker image). Empty in dev.
     spa_dist_dir: str = ""
 

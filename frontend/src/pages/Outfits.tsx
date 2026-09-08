@@ -36,7 +36,10 @@ export default function Outfits() {
     <>
       <div className="toolbar">
         <h1>Outfits</h1>
-        <Link to="/outfits/new">+ New outfit</Link>
+        <div className="toolbar-actions">
+          <Link to="/outfits/suggest">✨ Suggest</Link>
+          <Link to="/outfits/new">+ New outfit</Link>
+        </div>
       </div>
 
       {isLoading && <p>Loading…</p>}

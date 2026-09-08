@@ -16,6 +16,7 @@ from app.main import app
 @pytest.fixture()
 def client(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Iterator[TestClient]:
     monkeypatch.setenv("MEDIA_DIR", str(tmp_path))
+    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)  # never hit the real API in tests
     get_settings.cache_clear()
 
     engine = create_engine(

@@ -8,6 +8,7 @@ import ItemForm from "./pages/ItemForm";
 import OutfitDetail from "./pages/OutfitDetail";
 import OutfitForm from "./pages/OutfitForm";
 import Outfits from "./pages/Outfits";
+import SuggestOutfit from "./pages/SuggestOutfit";
 import Wardrobe from "./pages/Wardrobe";
 
 const queryClient = new QueryClient({
@@ -53,6 +54,7 @@ export default function App() {
               <Route path="/items/:id/edit" element={<ItemForm />} />
               <Route path="/outfits" element={<Outfits />} />
               <Route path="/outfits/new" element={<OutfitForm />} />
+              <Route path="/outfits/suggest" element={<SuggestOutfit />} />
               <Route path="/outfits/:id" element={<OutfitDetail />} />
               <Route path="/outfits/:id/edit" element={<OutfitForm />} />
             </Routes>

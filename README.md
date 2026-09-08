@@ -14,9 +14,9 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for the full design.
 
 ## Status
 
-**Phase 3 — outfits.** Live on Railway. HTTP Basic Auth gate; `Item` CRUD with
-photo uploads (Railway volume); `Outfit` CRUD grouping items; React UI with a
-wardrobe grid and an outfit builder.
+**Phase 3 — outfits + AI stylist.** Live on Railway. HTTP Basic Auth gate; `Item`
+CRUD with photo uploads (Railway volume); `Outfit` CRUD grouping items; a "suggest
+an outfit for today" feature powered by Claude (`ANTHROPIC_API_KEY`, optional).
 Next: polish (search / filters / mobile) or wear tracking.
 
 ## Local development

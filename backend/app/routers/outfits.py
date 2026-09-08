@@ -5,8 +5,16 @@ from sqlalchemy.orm import Session
 from app.deps import get_db
 from app.models.item import Item
 from app.models.outfit import Outfit
-from app.schemas.outfit import OutfitCreate, OutfitRead, OutfitUpdate
+from app.schemas.item import ItemRead
+from app.schemas.outfit import (
+    OutfitCreate,
+    OutfitRead,
+    OutfitSuggestion,
+    OutfitSuggestRequest,
+    OutfitUpdate,
+)
 from app.security import require_auth
+from app.stylist import StylistUnavailable, suggest_outfit
 
 router = APIRouter(
     prefix="/api/outfits",
@@ -39,6 +47,23 @@ def create_outfit(payload: OutfitCreate, db: Session = Depends(get_db)) -> Outfi
     db.commit()
     db.refresh(outfit)
     return outfit
+
+
+@router.post("/suggest", response_model=OutfitSuggestion)
+def suggest(payload: OutfitSuggestRequest, db: Session = Depends(get_db)) -> OutfitSuggestion:
+    items = list(
+        db.execute(select(Item).where(Item.is_archived.is_(False))).scalars().all()
+    )
+    try:
+        item_ids, rationale = suggest_outfit(payload.prompt, items)
+    except StylistUnavailable as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+
+    chosen = _items_for(db, item_ids)
+    return OutfitSuggestion(
+        items=[ItemRead.model_validate(i) for i in chosen],
+        rationale=rationale,
+    )
 
 
 @router.get("/{outfit_id}", response_model=OutfitRead)

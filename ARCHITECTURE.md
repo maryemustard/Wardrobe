@@ -11,6 +11,7 @@ wear. One person (the owner) uses it. Deployed on Railway.
 | Database  | PostgreSQL                                          | Railway managed plugin; `DATABASE_URL` injected |
 | Frontend  | React + Vite + TypeScript                           | React Router, TanStack Query for server state |
 | Access    | HTTP Basic Auth, single credential                  | `BASIC_AUTH_USER` / `BASIC_AUTH_PASS` env vars, checked by FastAPI middleware. No user accounts, no signup, no JWT. |
+| AI stylist | Anthropic API (`claude-opus-5`)                     | `POST /api/outfits/suggest` sends the wardrobe + a plain-text plan; structured-output JSON back (`item_ids`, `rationale`). Optional — needs `ANTHROPIC_API_KEY`; 503 with a friendly message when unset. |
 | Images    | Railway Volume                                      | Multipart upload to the API, saved on a mounted disk (`MEDIA_DIR`), served at `/media/*`; DB stores the relative URL + filename |
 | Deploy    | Railway, single service via multi-stage Dockerfile  | Node build stage -> Python runtime; FastAPI serves `/api/*` and the built SPA at `/` |
 | CI        | GitHub Actions                                      | Lint + test on PR |
@@ -48,6 +49,7 @@ Items     GET  /items           filters: category, season, brand, q, archived; p
 
 Outfits   GET  /outfits         POST /outfits (body has item_ids)
           GET  /outfits/{id}    PATCH /outfits/{id}   DELETE /outfits/{id}
+          POST /outfits/suggest   { prompt } -> Claude picks items + a rationale
 
 Stats     GET  /stats           phase 2: counts by category, most/least worn, cost-per-wear
 

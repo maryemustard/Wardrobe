@@ -29,3 +29,12 @@ class OutfitRead(OutfitBase):
     created_at: datetime
     updated_at: datetime
     items: list[ItemRead]
+
+
+class OutfitSuggestRequest(BaseModel):
+    prompt: str = Field(min_length=1, max_length=500)
+
+
+class OutfitSuggestion(BaseModel):
+    items: list[ItemRead]
+    rationale: str
