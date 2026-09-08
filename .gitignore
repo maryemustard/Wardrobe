@@ -34,3 +34,10 @@ dist/
 
 # --- Uploaded media (local dev; prod uses a Railway volume) ---
 backend/media/
+
+# --- Django MVP (django_app/) ---
+django_app/.venv/
+django_app/media/
+django_app/db.sqlite3
+django_app/staticfiles/
+*.sqlite3

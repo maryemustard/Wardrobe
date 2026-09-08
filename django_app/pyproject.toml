@@ -1,0 +1,9 @@
+[project]
+name = "wardrobe-django"
+version = "0.1.0"
+description = "Minimal Django MVP for the Wardrobe app (ENTR 5000)"
+requires-python = ">=3.11"
+dependencies = [
+    "django>=5.2,<6",
+    "pillow>=10",
+]
