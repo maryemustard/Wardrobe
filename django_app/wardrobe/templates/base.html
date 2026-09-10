@@ -3,16 +3,182 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Wardrobe</title>
+    <title>My Wardrobe ✨</title>
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
       rel="stylesheet"
     />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700&family=Nunito:wght@400;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #fff4f8;
+        --card: #ffffff;
+        --ink: #5b3a5b;
+        --muted: #a986a1;
+        --pink: #ff8fab;
+        --pink-strong: #f5729a;
+        --pink-soft: #ffe3ec;
+        --mint: #a7ecc9;
+        --yellow: #ffe08a;
+        --lav: #cdbef7;
+        --border: #ffe0ea;
+      }
+
+      body {
+        background: var(--bg);
+        color: var(--ink);
+        font-family: "Nunito", system-ui, sans-serif;
+        min-height: 100vh;
+        position: relative;
+        overflow-x: hidden;
+      }
+
+      /* soft candy blobs behind everything */
+      body::before,
+      body::after {
+        content: "";
+        position: fixed;
+        z-index: -1;
+        filter: blur(60px);
+        opacity: 0.45;
+        pointer-events: none;
+      }
+      body::before {
+        top: -8rem;
+        left: -6rem;
+        width: 24rem;
+        height: 24rem;
+        background: radial-gradient(circle at 30% 30%, var(--yellow), transparent 65%);
+      }
+      body::after {
+        bottom: -10rem;
+        right: -8rem;
+        width: 28rem;
+        height: 28rem;
+        background: radial-gradient(circle at 60% 60%, var(--lav), transparent 65%);
+      }
+
+      h1, h2, h3, .brand {
+        font-family: "Baloo 2", system-ui, sans-serif;
+        color: var(--ink);
+      }
+
+      .navbar {
+        background: rgba(255, 255, 255, 0.85) !important;
+        backdrop-filter: blur(8px);
+        border-bottom: 2px solid var(--border) !important;
+      }
+      .navbar .brand {
+        font-size: 1.6rem;
+        font-weight: 700;
+      }
+      .navbar .brand .dress {
+        display: inline-block;
+        transition: transform 0.3s ease;
+      }
+      .navbar .brand:hover .dress {
+        transform: rotate(-12deg) scale(1.15);
+      }
+
+      a {
+        color: var(--pink-strong);
+        font-weight: 700;
+      }
+      a:hover {
+        color: var(--pink);
+      }
+
+      .card {
+        background: var(--card);
+        border: 2px solid var(--border);
+        border-radius: 22px;
+        box-shadow: 0 12px 28px -14px rgba(245, 114, 154, 0.45);
+        overflow: hidden;
+        transition: transform 0.16s ease, box-shadow 0.16s ease;
+      }
+      .grid-card:hover {
+        transform: translateY(-6px) rotate(-1.2deg);
+        box-shadow: 0 20px 38px -16px rgba(245, 114, 154, 0.55);
+      }
+      .card-img-top,
+      .noimg {
+        aspect-ratio: 1;
+        object-fit: cover;
+      }
+      .noimg {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 0.25rem;
+        font-family: "Baloo 2", sans-serif;
+        color: var(--pink-strong);
+        background: linear-gradient(135deg, var(--pink-soft), #e5fff2);
+      }
+      .noimg .big {
+        font-size: 2.4rem;
+        line-height: 1;
+      }
+
+      .form-label {
+        font-weight: 800;
+        color: var(--muted);
+        margin-bottom: 0.25rem;
+      }
+      .form-control,
+      .form-select {
+        border: 2px solid var(--border);
+        border-radius: 14px;
+        padding: 0.55rem 0.8rem;
+      }
+      .form-control:focus,
+      .form-select:focus {
+        border-color: var(--pink);
+        box-shadow: 0 0 0 4px var(--pink-soft);
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, #ff9ec1, var(--pink-strong));
+        border: none;
+        border-radius: 999px;
+        font-weight: 800;
+        padding: 0.6rem 1.6rem;
+        box-shadow: 0 10px 20px -8px rgba(245, 114, 154, 0.65);
+        transition: transform 0.14s ease, box-shadow 0.14s ease;
+      }
+      .btn-primary:hover {
+        background: linear-gradient(135deg, #ff9ec1, var(--pink-strong));
+        transform: translateY(-2px) scale(1.03);
+        box-shadow: 0 16px 26px -10px rgba(245, 114, 154, 0.7);
+      }
+      .btn-link {
+        color: var(--muted);
+      }
+
+      .empty {
+        text-align: center;
+        color: var(--muted);
+        font-weight: 700;
+        padding: 3rem 1rem;
+      }
+      .empty .big {
+        font-size: 3rem;
+        display: block;
+        margin-bottom: 0.5rem;
+      }
+    </style>
   </head>
-  <body class="bg-body-tertiary">
-    <nav class="navbar bg-white border-bottom mb-4">
+  <body>
+    <nav class="navbar mb-4">
       <div class="container">
-        <span class="navbar-brand mb-0 h1">👗 Wardrobe</span>
+        <a href="{% url 'wardrobe' %}" class="brand text-decoration-none">
+          <span class="dress">👗</span> My Wardrobe
+        </a>
       </div>
     </nav>
     <main class="container pb-5">{% block content %}{% endblock %}</main>

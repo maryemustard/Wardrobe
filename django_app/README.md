@@ -22,6 +22,10 @@ Main page at `/`:
 
 No HTMX, no JavaScript build step — plain form POSTs with redirects.
 
+Styling is a small inline theme in `base.html` (Google Fonts + a `<style>`
+block over Bootstrap): soft pink/cream palette, rounded cards, and category
+emojis (👕 👖 👗 🧥 👟 👜) from `Item.emoji`.
+
 ## Run it locally
 
 ### With uv (the class way)

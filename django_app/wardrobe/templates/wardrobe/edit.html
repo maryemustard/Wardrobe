@@ -4,23 +4,27 @@
 <div class="row">
   <div class="col-lg-5">
     <a href="{% url 'wardrobe' %}" class="small">&larr; Back to wardrobe</a>
-    <h1 class="h3 my-3">Edit item</h1>
+    <h1 class="my-3">✏️ Edit item</h1>
 
     {% if item.photo %}
       <img
         src="{{ item.photo.url }}"
         alt="{{ item.name }}"
-        class="img-fluid rounded border mb-3"
+        class="img-fluid rounded-4 border mb-3"
         style="max-width: 12rem;"
       />
     {% endif %}
 
-    <form method="post" enctype="multipart/form-data" novalidate>
-      {% csrf_token %}
-      {% include "wardrobe/_form_fields.html" %}
-      <button type="submit" class="btn btn-primary">Save changes</button>
-      <a href="{% url 'wardrobe' %}" class="btn btn-link">Cancel</a>
-    </form>
+    <div class="card">
+      <div class="card-body">
+        <form method="post" enctype="multipart/form-data" novalidate>
+          {% csrf_token %}
+          {% include "wardrobe/_form_fields.html" %}
+          <button type="submit" class="btn btn-primary">Save changes 💫</button>
+          <a href="{% url 'wardrobe' %}" class="btn btn-link">Cancel</a>
+        </form>
+      </div>
+    </div>
   </div>
 </div>
 {% endblock %}
