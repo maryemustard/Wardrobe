@@ -94,8 +94,13 @@ The app is production-ready: Gunicorn, WhiteNoise for static files, PostgreSQL
 via `DATABASE_URL` (SQLite locally), a `Procfile` that runs `migrate` +
 `collectstatic` before starting. It builds with Nixpacks — no Dockerfile.
 
+Deploy config lives in [`railway.toml`](railway.toml) (Nixpacks builder + start
+command). The repo root has a *different* `railway.toml` for the other app, so:
+
 1. Railway → **New Project → Deploy from GitHub repo** → this repo.
-2. On the service: **Settings → Root Directory** = `django_app`.
+2. On the service: **Settings → Root Directory** = `django_app`, and
+   **Settings → Build → Config File Path** = `django_app/railway.toml`
+   (so it doesn't pick up the repo-root config).
 3. **+ Create → Database → PostgreSQL** in the project.
 4. **+ Create → Volume**, mount path `/data` (keeps uploaded photos).
 5. Service **Variables**:

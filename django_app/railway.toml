@@ -1,0 +1,14 @@
+# Deploy config for the Django MVP service ONLY.
+#
+# The repo root has its own railway.toml for the FastAPI app (backend/ + frontend/)
+# which pins a Dockerfile build. This service must NOT use that one — in the
+# Railway service settings, set "Config File Path" to `django_app/railway.toml`
+# so this file wins. Root Directory is also set to `django_app`.
+
+[build]
+builder = "NIXPACKS"
+
+[deploy]
+startCommand = "python manage.py migrate --noinput && python manage.py collectstatic --noinput && gunicorn config.wsgi --bind 0.0.0.0:$PORT"
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 3

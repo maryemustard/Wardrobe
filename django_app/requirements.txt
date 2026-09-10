@@ -1,0 +1,9 @@
+# Mirror of pyproject.toml [project].dependencies, for build systems that
+# install from requirements.txt (Railway Nixpacks/Railpack). Keep in sync.
+anthropic>=1.0
+django>=5.2,<6
+pillow>=10
+gunicorn>=21
+whitenoise>=6
+dj-database-url>=2
+psycopg[binary]>=3.2
