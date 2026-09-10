@@ -88,11 +88,30 @@ to edit, deleting a missing id is a 404; logging a wear increments the count,
 undo decrements, undo with no wears is safe, the count shows on the grid.
 (22 tests.)
 
-## Config (deploy only)
+## Deploy to Railway
 
-Local dev reads no environment variables. For deployment, copy `.env.example`
-to `.env` and set `DJANGO_SECRET_KEY`, `DJANGO_DEBUG=false`, and
-`DJANGO_ALLOWED_HOSTS`. `settings.py` reads these from the environment.
+The app is production-ready: Gunicorn, WhiteNoise for static files, PostgreSQL
+via `DATABASE_URL` (SQLite locally), a `Procfile` that runs `migrate` +
+`collectstatic` before starting. It builds with Nixpacks — no Dockerfile.
+
+1. Railway → **New Project → Deploy from GitHub repo** → this repo.
+2. On the service: **Settings → Root Directory** = `django_app`.
+3. **+ Create → Database → PostgreSQL** in the project.
+4. **+ Create → Volume**, mount path `/data` (keeps uploaded photos).
+5. Service **Variables**:
+   | Name | Value |
+   |---|---|
+   | `DATABASE_URL` | reference `Postgres.DATABASE_URL` |
+   | `DJANGO_SECRET_KEY` | a long random string |
+   | `DJANGO_DEBUG` | `false` |
+   | `DJANGO_ALLOWED_HOSTS` | the generated domain, no `https://` |
+   | `DJANGO_CSRF_TRUSTED_ORIGINS` | `https://` + the generated domain |
+   | `DJANGO_MEDIA_ROOT` | `/data/media` |
+   | `ANTHROPIC_API_KEY` | optional (or set it in the app's Settings page) |
+6. **Settings → Networking → Generate Domain**, then put that exact host in
+   `DJANGO_ALLOWED_HOSTS` / `DJANGO_CSRF_TRUSTED_ORIGINS` and redeploy.
+
+`settings.py` reads every one of these from the environment.
 
 ## Layout
 
