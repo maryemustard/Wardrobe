@@ -179,7 +179,10 @@
         <a href="{% url 'wardrobe' %}" class="brand text-decoration-none">
           <span class="dress">👗</span> My Wardrobe
         </a>
-        <a href="{% url 'suggest' %}" class="text-decoration-none">✨ Suggest an outfit</a>
+        <div class="d-flex gap-3 align-items-center">
+          <a href="{% url 'suggest' %}" class="text-decoration-none">✨ Suggest an outfit</a>
+          <a href="{% url 'settings' %}" class="text-decoration-none">🔑 Settings</a>
+        </div>
       </div>
     </nav>
     <main class="container pb-5">{% block content %}{% endblock %}</main>

@@ -17,8 +17,10 @@ Main page at `/`:
 - Each card has an **Edit** link → `/<id>/edit/`, a prefilled form to change the
   item (or swap/clear its photo) and save.
 - `/suggest/` — type a "vibe" and Claude picks an outfit from your wardrobe with
-  a short blurb. Optional: needs `ANTHROPIC_API_KEY`; without it the page shows a
-  friendly "not set up" message and everything else still works.
+  a short blurb. Optional AI feature.
+- `/settings/` — paste your Anthropic API key here (saved in the local database;
+  gitignored) so `/suggest/` works without touching environment variables. The
+  `ANTHROPIC_API_KEY` env var still works and takes priority if set.
 - Saved items persist across refreshes (SQLite; photos in `media/`).
 - Missing name → inline error. Non-image or >8 MB photo → inline error. No crash.
 - Empty wardrobe shows a "add your first one" message.
@@ -77,7 +79,8 @@ shows in the grid; a blank name is rejected with a message and no row saved;
 a non-image upload is rejected; the edit page is prefilled; editing updates
 the item; editing a missing id is a 404; the suggest page loads; suggesting
 with no API key shows a message (no crash); a mocked suggestion renders the
-picked items. (10 tests.)
+picked items; the settings page loads and saves / keeps / clears the API key;
+the stylist reads the saved key. (15 tests.)
 
 ## Config (deploy only)
 
@@ -93,11 +96,11 @@ django_app/
   manage.py
   config/                   project settings, urls, wsgi/asgi
   wardrobe/                 the one app
-    models.py               Item(name, category, description, photo, created_at) + .emoji
-    forms.py                ItemForm + photo size check
-    views.py                wardrobe (list + create), edit_item, suggest
-    stylist.py              Claude call for /suggest/ (optional; ANTHROPIC_API_KEY)
-    templates/wardrobe/     wardrobe.html, edit.html, suggest.html, _form_fields.html
+    models.py               Item(...) + .emoji; AppSettings (holds the API key)
+    forms.py                ItemForm; ApiKeyForm
+    views.py                wardrobe, edit_item, suggest, settings_page
+    stylist.py              Claude call for /suggest/ (key from Settings or env)
+    templates/wardrobe/     wardrobe / edit / suggest / settings / _form_fields
     tests.py
   media/                    uploaded photos (gitignored)
   db.sqlite3               local database (gitignored)

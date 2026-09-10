@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="mb-4">🔑 Settings</h1>
+
+<div class="card" style="max-width: 34rem;">
+  <div class="card-body">
+    <h2 class="h5 mb-3">Anthropic API key</h2>
+    <p class="text-muted small">
+      Needed for the ✨ Suggest an outfit page. Get one at
+      <a href="https://console.anthropic.com" target="_blank" rel="noopener">console.anthropic.com</a>.
+      It's saved in this app's local database on your computer and only ever sent to Anthropic.
+    </p>
+
+    {% if has_key %}
+      <p class="fw-bold">✅ A key is saved (ends {{ key_hint }})</p>
+    {% else %}
+      <p class="fw-bold text-muted">No key saved yet.</p>
+    {% endif %}
+
+    <form method="post">
+      {% csrf_token %}
+      <div class="mb-3">
+        <label class="form-label" for="{{ form.anthropic_api_key.id_for_label }}">
+          {% if has_key %}Replace the key{% else %}Paste your key{% endif %}
+        </label>
+        {{ form.anthropic_api_key }}
+      </div>
+      <button type="submit" class="btn btn-primary">Save key 💾</button>
+      {% if has_key %}
+        <button type="submit" name="remove" value="1" class="btn btn-link">Remove key</button>
+      {% endif %}
+    </form>
+  </div>
+</div>
+{% endblock %}

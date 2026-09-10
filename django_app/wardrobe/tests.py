@@ -4,7 +4,8 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.urls import reverse
 
-from .models import Item
+from .models import AppSettings, Item
+from .stylist import _api_key
 
 
 class WardrobeTests(TestCase):
@@ -90,3 +91,37 @@ class WardrobeTests(TestCase):
         self.assertContains(resp, "Cute and comfy for coffee.")
         self.assertContains(resp, "White Tee")
         self.assertContains(resp, "Blue Jeans")
+
+    def test_settings_page_loads(self):
+        resp = self.client.get(reverse("settings"))
+        self.assertEqual(resp.status_code, 200)
+        self.assertContains(resp, "No key saved yet")
+
+    def test_settings_form_saves_the_key(self):
+        resp = self.client.post(
+            reverse("settings"), {"anthropic_api_key": "sk-ant-test-12345"}
+        )
+        self.assertRedirects(resp, reverse("settings"))
+        self.assertEqual(AppSettings.load().anthropic_api_key, "sk-ant-test-12345")
+        page = self.client.get(reverse("settings"))
+        self.assertContains(page, "ends …2345")
+
+    def test_blank_submit_keeps_the_existing_key(self):
+        cfg = AppSettings.load()
+        cfg.anthropic_api_key = "sk-ant-keepme"
+        cfg.save()
+        self.client.post(reverse("settings"), {"anthropic_api_key": ""})
+        self.assertEqual(AppSettings.load().anthropic_api_key, "sk-ant-keepme")
+
+    def test_remove_button_clears_the_key(self):
+        cfg = AppSettings.load()
+        cfg.anthropic_api_key = "sk-ant-deleteme"
+        cfg.save()
+        self.client.post(reverse("settings"), {"remove": "1"})
+        self.assertEqual(AppSettings.load().anthropic_api_key, "")
+
+    def test_stylist_uses_the_saved_key(self):
+        cfg = AppSettings.load()
+        cfg.anthropic_api_key = "sk-ant-from-db"
+        cfg.save()
+        self.assertEqual(_api_key(), "sk-ant-from-db")

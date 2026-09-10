@@ -1,4 +1,5 @@
-"""AI outfit suggestions, powered by Claude. Optional — needs ANTHROPIC_API_KEY."""
+"""AI outfit suggestions, powered by Claude. Optional — needs an API key
+(set on the /settings/ page, or via the ANTHROPIC_API_KEY env var)."""
 
 import json
 
@@ -35,11 +36,17 @@ class StylistUnavailable(RuntimeError):
     """The stylist could not produce a suggestion (no key, upstream error, ...)."""
 
 
+def _api_key() -> str:
+    from .models import AppSettings
+
+    return settings.ANTHROPIC_API_KEY or AppSettings.load().anthropic_api_key
+
+
 def suggest_outfit(vibe, items):
     """Return (chosen item ids, rationale). Raises StylistUnavailable on any failure."""
-    key = settings.ANTHROPIC_API_KEY
+    key = _api_key()
     if not key:
-        raise StylistUnavailable("AI suggestions are not set up yet (no ANTHROPIC_API_KEY).")
+        raise StylistUnavailable("AI suggestions are not set up yet — add your API key in Settings.")
     if not items:
         raise StylistUnavailable("Add a few items to your wardrobe first!")
 

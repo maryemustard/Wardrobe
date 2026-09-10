@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404, redirect, render
 
-from .forms import ItemForm
-from .models import Item
+from .forms import ApiKeyForm, ItemForm
+from .models import AppSettings, Item
 from .stylist import StylistUnavailable, suggest_outfit
 
 
@@ -56,4 +56,35 @@ def suggest(request):
         request,
         "wardrobe/suggest.html",
         {"vibe": vibe, "picks": picks, "rationale": rationale, "error": error},
+    )
+
+
+def settings_page(request):
+    """Paste your Anthropic API key here instead of using an env var."""
+    cfg = AppSettings.load()
+
+    if request.method == "POST":
+        if "remove" in request.POST:
+            cfg.anthropic_api_key = ""
+            cfg.save()
+            return redirect("settings")
+        form = ApiKeyForm(request.POST)
+        if form.is_valid():
+            new_key = (form.cleaned_data.get("anthropic_api_key") or "").strip()
+            if new_key:
+                cfg.anthropic_api_key = new_key
+                cfg.save()
+            return redirect("settings")
+    else:
+        form = ApiKeyForm()
+
+    key = cfg.anthropic_api_key
+    return render(
+        request,
+        "wardrobe/settings.html",
+        {
+            "form": form,
+            "has_key": bool(key),
+            "key_hint": ("…" + key[-4:]) if len(key) >= 4 else "",
+        },
     )

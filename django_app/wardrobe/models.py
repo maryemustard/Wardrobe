@@ -34,3 +34,18 @@ class Item(models.Model):
     @property
     def emoji(self) -> str:
         return self.CATEGORY_EMOJI.get(self.category, "👚")
+
+
+class AppSettings(models.Model):
+    """One row of app-wide settings (there is only ever one, pk=1)."""
+
+    anthropic_api_key = models.CharField(max_length=200, blank=True)
+
+    def save(self, *args, **kwargs):
+        self.pk = 1
+        super().save(*args, **kwargs)
+
+    @classmethod
+    def load(cls) -> "AppSettings":
+        obj, _ = cls.objects.get_or_create(pk=1)
+        return obj
