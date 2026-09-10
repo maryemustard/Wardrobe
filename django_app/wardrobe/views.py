@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404, redirect, render
 
 from .forms import ApiKeyForm, ItemForm
-from .models import AppSettings, Item
+from .models import AppSettings, Item, Wear
 from .stylist import StylistUnavailable, suggest_outfit
 
 
@@ -45,6 +45,24 @@ def delete_item(request, pk):
         item.delete()
         return redirect("wardrobe")
     return redirect("edit_item", pk=pk)
+
+
+def log_wear(request, pk):
+    """Record that you wore this item today."""
+    item = get_object_or_404(Item, pk=pk)
+    if request.method == "POST":
+        Wear.objects.create(item=item)
+    return redirect("wardrobe")
+
+
+def unlog_wear(request, pk):
+    """Undo the most recent wear for this item."""
+    item = get_object_or_404(Item, pk=pk)
+    if request.method == "POST":
+        latest = item.wears.first()
+        if latest:
+            latest.delete()
+    return redirect("wardrobe")
 
 
 def suggest(request):

@@ -17,6 +17,8 @@ Main page at `/`:
 - Each card has an **Edit** link → `/<id>/edit/`, a prefilled form to change the
   item (or swap/clear its photo) and save, plus a **Delete this item** button
   (with a confirm) that removes the item and its photo file.
+- Wear tracking: each card shows **👕 worn N×** with a **+ wore it** button
+  (logs today) and an **undo**; the edit page shows the total and last-worn date.
 - `/suggest/` — type a "vibe" and Claude picks an outfit from your wardrobe with
   a short blurb. Optional AI feature.
 - `/settings/` — paste your Anthropic API key here (saved in the local database;
@@ -82,7 +84,9 @@ the item; editing a missing id is a 404; the suggest page loads; suggesting
 with no API key shows a message (no crash); a mocked suggestion renders the
 picked items; the settings page loads and saves / keeps / clears the API key;
 the stylist reads the saved key; delete removes an item (POST), a GET bounces
-to edit, deleting a missing id is a 404. (18 tests.)
+to edit, deleting a missing id is a 404; logging a wear increments the count,
+undo decrements, undo with no wears is safe, the count shows on the grid.
+(22 tests.)
 
 ## Config (deploy only)
 
@@ -98,9 +102,9 @@ django_app/
   manage.py
   config/                   project settings, urls, wsgi/asgi
   wardrobe/                 the one app
-    models.py               Item(...) + .emoji; AppSettings (holds the API key)
+    models.py               Item (+ .emoji, .wear_count, .last_worn); Wear; AppSettings
     forms.py                ItemForm; ApiKeyForm
-    views.py                wardrobe, edit_item, delete_item, suggest, settings_page
+    views.py                wardrobe, edit_item, delete_item, log_wear, unlog_wear, suggest, settings_page
     stylist.py              Claude call for /suggest/ (key from Settings or env)
     templates/wardrobe/     wardrobe / edit / suggest / settings / _form_fields
     tests.py

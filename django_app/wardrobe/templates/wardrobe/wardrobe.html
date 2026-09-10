@@ -22,7 +22,7 @@
       <div class="row row-cols-2 row-cols-md-3 g-3">
         {% for item in items %}
           <div class="col">
-            <div class="card grid-card h-100 position-relative">
+            <div class="card grid-card h-100">
               {% if item.photo %}
                 <img
                   src="{{ item.photo.url }}"
@@ -41,10 +41,27 @@
                 {% if item.description %}
                   <div class="small mt-1">{{ item.description }}</div>
                 {% endif %}
-                <a
-                  href="{% url 'edit_item' item.pk %}"
-                  class="stretched-link small d-inline-block mt-2"
-                >✏️ Edit</a>
+
+                <div class="text-muted small mt-2">
+                  👕 worn {{ item.wear_count }}×
+                </div>
+                <div class="d-flex gap-2 align-items-center mt-1 flex-wrap">
+                  <form method="post" action="{% url 'log_wear' item.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary btn-sm py-1 px-2">
+                      + wore it
+                    </button>
+                  </form>
+                  {% if item.wear_count %}
+                    <form method="post" action="{% url 'unlog_wear' item.pk %}">
+                      {% csrf_token %}
+                      <button type="submit" class="btn btn-link btn-sm p-0 text-muted">
+                        undo
+                      </button>
+                    </form>
+                  {% endif %}
+                  <a href="{% url 'edit_item' item.pk %}" class="small ms-auto">✏️ Edit</a>
+                </div>
               </div>
             </div>
           </div>

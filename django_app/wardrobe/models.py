@@ -1,3 +1,5 @@
+from datetime import date
+
 from django.db import models
 
 
@@ -34,6 +36,28 @@ class Item(models.Model):
     @property
     def emoji(self) -> str:
         return self.CATEGORY_EMOJI.get(self.category, "👚")
+
+    @property
+    def wear_count(self) -> int:
+        return self.wears.count()
+
+    @property
+    def last_worn(self):
+        latest = self.wears.first()  # wears are ordered newest-first
+        return latest.worn_on if latest else None
+
+
+class Wear(models.Model):
+    """One time an item was worn."""
+
+    item = models.ForeignKey(Item, related_name="wears", on_delete=models.CASCADE)
+    worn_on = models.DateField(default=date.today)
+
+    class Meta:
+        ordering = ["-worn_on", "-id"]
+
+    def __str__(self) -> str:
+        return f"{self.item} worn {self.worn_on}"
 
 
 class AppSettings(models.Model):

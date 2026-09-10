@@ -84,6 +84,31 @@ class WardrobeTests(TestCase):
         resp = self.client.post(reverse("delete_item", args=[9999]))
         self.assertEqual(resp.status_code, 404)
 
+    def test_logging_a_wear_increments_the_count(self):
+        item = Item.objects.create(name="Grey Hoodie", category="top")
+        self.client.post(reverse("log_wear", args=[item.pk]))
+        self.client.post(reverse("log_wear", args=[item.pk]))
+        self.assertEqual(item.wear_count, 2)
+
+    def test_undo_wear_decrements_the_count(self):
+        item = Item.objects.create(name="Grey Hoodie", category="top")
+        self.client.post(reverse("log_wear", args=[item.pk]))
+        self.client.post(reverse("log_wear", args=[item.pk]))
+        self.client.post(reverse("unlog_wear", args=[item.pk]))
+        self.assertEqual(item.wear_count, 1)
+
+    def test_undo_with_no_wears_is_safe(self):
+        item = Item.objects.create(name="Grey Hoodie", category="top")
+        resp = self.client.post(reverse("unlog_wear", args=[item.pk]))
+        self.assertEqual(resp.status_code, 302)
+        self.assertEqual(item.wear_count, 0)
+
+    def test_wear_count_shows_on_the_wardrobe_page(self):
+        item = Item.objects.create(name="Grey Hoodie", category="top")
+        self.client.post(reverse("log_wear", args=[item.pk]))
+        resp = self.client.get(reverse("wardrobe"))
+        self.assertContains(resp, "worn 1×")
+
     def test_suggest_page_loads(self):
         resp = self.client.get(reverse("suggest"))
         self.assertEqual(resp.status_code, 200)
