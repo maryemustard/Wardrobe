@@ -37,6 +37,16 @@ def edit_item(request, pk):
     return render(request, "wardrobe/edit.html", {"form": form, "item": item})
 
 
+def delete_item(request, pk):
+    """Delete one item (and its photo file). POST only; GET bounces to edit."""
+    item = get_object_or_404(Item, pk=pk)
+    if request.method == "POST":
+        item.photo.delete(save=False)  # remove the file; no-op if there's no photo
+        item.delete()
+        return redirect("wardrobe")
+    return redirect("edit_item", pk=pk)
+
+
 def suggest(request):
     """Type a vibe, get an outfit picked from your wardrobe by Claude."""
     vibe = request.POST.get("vibe", "").strip() if request.method == "POST" else ""

@@ -68,6 +68,22 @@ class WardrobeTests(TestCase):
         resp = self.client.get(reverse("edit_item", args=[9999]))
         self.assertEqual(resp.status_code, 404)
 
+    def test_delete_removes_the_item(self):
+        item = Item.objects.create(name="Toss me", category="top")
+        resp = self.client.post(reverse("delete_item", args=[item.pk]))
+        self.assertRedirects(resp, reverse("wardrobe"))
+        self.assertEqual(Item.objects.count(), 0)
+
+    def test_delete_via_get_just_bounces_to_edit(self):
+        item = Item.objects.create(name="Keep me", category="top")
+        resp = self.client.get(reverse("delete_item", args=[item.pk]))
+        self.assertRedirects(resp, reverse("edit_item", args=[item.pk]))
+        self.assertEqual(Item.objects.count(), 1)
+
+    def test_deleting_a_missing_item_is_404(self):
+        resp = self.client.post(reverse("delete_item", args=[9999]))
+        self.assertEqual(resp.status_code, 404)
+
     def test_suggest_page_loads(self):
         resp = self.client.get(reverse("suggest"))
         self.assertEqual(resp.status_code, 200)

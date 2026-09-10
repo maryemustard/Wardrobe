@@ -15,7 +15,8 @@ Main page at `/`:
 - A grid of everything you've saved, newest first, with the photo on each card
   (or a category placeholder if there's no photo).
 - Each card has an **Edit** link → `/<id>/edit/`, a prefilled form to change the
-  item (or swap/clear its photo) and save.
+  item (or swap/clear its photo) and save, plus a **Delete this item** button
+  (with a confirm) that removes the item and its photo file.
 - `/suggest/` — type a "vibe" and Claude picks an outfit from your wardrobe with
   a short blurb. Optional AI feature.
 - `/settings/` — paste your Anthropic API key here (saved in the local database;
@@ -80,7 +81,8 @@ a non-image upload is rejected; the edit page is prefilled; editing updates
 the item; editing a missing id is a 404; the suggest page loads; suggesting
 with no API key shows a message (no crash); a mocked suggestion renders the
 picked items; the settings page loads and saves / keeps / clears the API key;
-the stylist reads the saved key. (15 tests.)
+the stylist reads the saved key; delete removes an item (POST), a GET bounces
+to edit, deleting a missing id is a 404. (18 tests.)
 
 ## Config (deploy only)
 
@@ -98,7 +100,7 @@ django_app/
   wardrobe/                 the one app
     models.py               Item(...) + .emoji; AppSettings (holds the API key)
     forms.py                ItemForm; ApiKeyForm
-    views.py                wardrobe, edit_item, suggest, settings_page
+    views.py                wardrobe, edit_item, delete_item, suggest, settings_page
     stylist.py              Claude call for /suggest/ (key from Settings or env)
     templates/wardrobe/     wardrobe / edit / suggest / settings / _form_fields
     tests.py
