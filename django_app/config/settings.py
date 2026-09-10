@@ -13,6 +13,9 @@ SECRET_KEY = os.environ.get(
     "DJANGO_SECRET_KEY", "django-insecure-dev-only-key-not-for-production"
 )
 DEBUG = os.environ.get("DJANGO_DEBUG", "true").lower() != "false"
+
+# Optional: enables the AI "suggest an outfit" page. Key from console.anthropic.com.
+ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
 ALLOWED_HOSTS = [
     h.strip()
     for h in os.environ.get("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")

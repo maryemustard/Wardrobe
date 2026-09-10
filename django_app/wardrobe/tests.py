@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.urls import reverse
@@ -64,3 +66,27 @@ class WardrobeTests(TestCase):
     def test_editing_a_missing_item_is_404(self):
         resp = self.client.get(reverse("edit_item", args=[9999]))
         self.assertEqual(resp.status_code, 404)
+
+    def test_suggest_page_loads(self):
+        resp = self.client.get(reverse("suggest"))
+        self.assertEqual(resp.status_code, 200)
+        self.assertContains(resp, "the vibe today")
+
+    def test_suggest_without_key_shows_message_not_a_crash(self):
+        Item.objects.create(name="Tee", category="top")
+        resp = self.client.post(reverse("suggest"), {"vibe": "brunch"})
+        self.assertEqual(resp.status_code, 200)
+        self.assertContains(resp, "not set up yet")
+
+    def test_suggest_renders_the_picked_items(self):
+        a = Item.objects.create(name="White Tee", category="top")
+        b = Item.objects.create(name="Blue Jeans", category="bottom")
+        with patch(
+            "wardrobe.views.suggest_outfit",
+            return_value=([a.id, 9999, b.id], "Cute and comfy for coffee."),
+        ):
+            resp = self.client.post(reverse("suggest"), {"vibe": "coffee"})
+        self.assertEqual(resp.status_code, 200)
+        self.assertContains(resp, "Cute and comfy for coffee.")
+        self.assertContains(resp, "White Tee")
+        self.assertContains(resp, "Blue Jeans")

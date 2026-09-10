@@ -2,6 +2,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 
 from .forms import ItemForm
 from .models import Item
+from .stylist import StylistUnavailable, suggest_outfit
 
 
 def wardrobe(request):
@@ -34,3 +35,25 @@ def edit_item(request, pk):
         form = ItemForm(instance=item)
 
     return render(request, "wardrobe/edit.html", {"form": form, "item": item})
+
+
+def suggest(request):
+    """Type a vibe, get an outfit picked from your wardrobe by Claude."""
+    vibe = request.POST.get("vibe", "").strip() if request.method == "POST" else ""
+    picks = None
+    rationale = None
+    error = None
+
+    if request.method == "POST" and vibe:
+        try:
+            ids, rationale = suggest_outfit(vibe, list(Item.objects.all()))
+            by_id = {it.id: it for it in Item.objects.filter(id__in=ids)}
+            picks = [by_id[i] for i in ids if i in by_id]
+        except StylistUnavailable as exc:
+            error = str(exc)
+
+    return render(
+        request,
+        "wardrobe/suggest.html",
+        {"vibe": vibe, "picks": picks, "rationale": rationale, "error": error},
+    )

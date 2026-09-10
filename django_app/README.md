@@ -16,6 +16,9 @@ Main page at `/`:
   (or a category placeholder if there's no photo).
 - Each card has an **Edit** link → `/<id>/edit/`, a prefilled form to change the
   item (or swap/clear its photo) and save.
+- `/suggest/` — type a "vibe" and Claude picks an outfit from your wardrobe with
+  a short blurb. Optional: needs `ANTHROPIC_API_KEY`; without it the page shows a
+  friendly "not set up" message and everything else still works.
 - Saved items persist across refreshes (SQLite; photos in `media/`).
 - Missing name → inline error. Non-image or >8 MB photo → inline error. No crash.
 - Empty wardrobe shows a "add your first one" message.
@@ -69,10 +72,12 @@ Then open **<http://127.0.0.1:8000/>**. Stop the server with **Ctrl-C**.
 uv run python manage.py test          # or: python manage.py test
 ```
 
-Covers: the page loads with the empty state; a valid item saves, redirects,
-and shows in the grid; a blank name is rejected with a message and no row
-saved; a non-image upload is rejected; the edit page is prefilled; editing
-updates the item; editing a missing id is a 404. (7 tests.)
+Covers: page loads with the empty state; a valid item saves, redirects, and
+shows in the grid; a blank name is rejected with a message and no row saved;
+a non-image upload is rejected; the edit page is prefilled; editing updates
+the item; editing a missing id is a 404; the suggest page loads; suggesting
+with no API key shows a message (no crash); a mocked suggestion renders the
+picked items. (10 tests.)
 
 ## Config (deploy only)
 
@@ -88,10 +93,11 @@ django_app/
   manage.py
   config/                   project settings, urls, wsgi/asgi
   wardrobe/                 the one app
-    models.py               Item(name, category, description, photo, created_at)
+    models.py               Item(name, category, description, photo, created_at) + .emoji
     forms.py                ItemForm + photo size check
-    views.py                wardrobe (list + create) and edit_item
-    templates/wardrobe/     wardrobe.html, edit.html, _form_fields.html
+    views.py                wardrobe (list + create), edit_item, suggest
+    stylist.py              Claude call for /suggest/ (optional; ANTHROPIC_API_KEY)
+    templates/wardrobe/     wardrobe.html, edit.html, suggest.html, _form_fields.html
     tests.py
   media/                    uploaded photos (gitignored)
   db.sqlite3               local database (gitignored)

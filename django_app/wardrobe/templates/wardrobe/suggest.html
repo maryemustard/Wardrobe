@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="mb-4">✨ Suggest an outfit</h1>
+
+<form method="post" class="mb-4" style="max-width: 32rem;">
+  {% csrf_token %}
+  <label class="form-label" for="vibe">What's the vibe today?</label>
+  <textarea
+    class="form-control mb-3"
+    id="vibe"
+    name="vibe"
+    rows="2"
+    placeholder="cozy coffee date, a bit chilly out"
+  >{{ vibe }}</textarea>
+  <button type="submit" class="btn btn-primary">Dress me 💫</button>
+</form>
+
+{% if error %}
+  <div class="empty">
+    <span class="big">🙈</span>
+    {{ error }}
+  </div>
+{% endif %}
+
+{% if rationale %}
+  <div class="card mb-4">
+    <div class="card-body">
+      <p class="mb-0 fw-bold">💬 {{ rationale }}</p>
+    </div>
+  </div>
+{% endif %}
+
+{% if picks %}
+  <div class="row row-cols-2 row-cols-md-4 g-3">
+    {% for item in picks %}
+      <div class="col">
+        <div class="card grid-card h-100">
+          {% if item.photo %}
+            <img src="{{ item.photo.url }}" class="card-img-top" alt="{{ item.name }}" />
+          {% else %}
+            <div class="noimg">
+              <span class="big">{{ item.emoji }}</span>
+              <span>{{ item.get_category_display }}</span>
+            </div>
+          {% endif %}
+          <div class="card-body">
+            <div class="fw-bold">{{ item.emoji }} {{ item.name }}</div>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% elif rationale %}
+  <div class="empty">
+    <span class="big">🤔</span>
+    The stylist didn't pick anything — try a different vibe.
+  </div>
+{% endif %}
+{% endblock %}
